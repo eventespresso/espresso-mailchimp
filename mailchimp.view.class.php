@@ -34,18 +34,9 @@ class MailChimpView{
 		}
 		?>
 		 <li>MailChimp API Key</li>
-		 <li><input size="45" type="text" name="mailchimp_api_key" value="<?php echo $currentKey; ?>" /> <a class="thickbox"  href="#TB_inline?height=400&amp;width=500&amp;inlineId=api-key-help" target="_blank"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/question-frame.png" width="16" height="16" alt="Help Link" /></a></li>
-		 <li><input class="button-primary" name="update_mailchimp_settings_post" value="Save MailChimp API Key" type="submit" /></li>
+		 <li><input type="text" name="mailchimp_api_key" value="<?php echo $currentKey; ?>" /> &nbsp;<a class="ev_reg-fancylink" href="#api-key"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL; ?>/images/question-frame.png" width="16" height="16" /></a></li>
+		 <li><input class="button-primary" name="update_mailchimp_settings_post" value="Save MailChimp API Key" type="submit"></li>
 		 </ul>
-		 </form>
-    <?php ### help dialogue ### ?>
-			<div id="api-key-help" style="display:none">
-			 <div class="TB-ee-frame">
-    	 <h2><?php _e("MailChimp API Key","event_espresso"); ?> </h2>
-    	 <p><?php _e("If you do not have a MailChimp API key, please <a href='http://kb.mailchimp.com/article/where-can-i-find-my-api-key/' target='_blank'>click here</a> to learn how to create one. </p><p>An API key is required for this plugin.",'event-espresso');?> </p>
-     </div>
-			</div>
-		 
 		 <?php
 	}
 	
@@ -67,20 +58,16 @@ class MailChimpView{
 			<?php _e('MailChimp List Integration','event_espresso'); ?>
 			</span></h3>
 			<div class="inside">
-			 <p>
-			  <a class="thickbox"  href="#TB_inline?height=400&amp;width=500&amp;inlineId=mailchimp-list-integration" target="_blank"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL ?>images/question-frame.png" width="16" height="16" alt="Help Link" /></a>
-			  <?php echo $lists; ?>
-			 </p>
+                <p><?php echo $lists; ?>&nbsp;<a class="ev_reg-fancylink" href="#mailchimp-list-integration"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL; ?>/images/question-frame.png" width="16" height="16" /></a></p>
+                <p id="mailchimp-groups">
+                    
+                </p>
+            </div>
 			</div>
-			</div>
-			<?php ### help dialogue ### ?>
 			<div id="mailchimp-list-integration" style="display:none">
-			 <div class="TB-ee-frame">
-			  <h2><?php _e("MailChimp List Integration","event_espresso"); ?> </h2>
-			  <p><?php _e("The following information will be sent to the selected MailChimp list for future communications <ul><li>Registrant's First Name</li><li>Registrant's Last Name</li><li>Registrant's Email Address</li></ul>",'event-espresso');?> </p>
-			 </div>
+			<h2><?php _e("MailChimp List Integration","event_espresso"); ?> </h2>
+			<p><?php _e("The following information will be sent to the selected MailChimp list for future communications <ul><li>Registrant's First Name</li><li>Registrant's Last Name</li><li>Registrant's Email Address</li></ul>",'event-espresso');?> </p>
 			</div>
-			
 			<?php
         }
     }
@@ -90,24 +77,13 @@ class MailChimpView{
      */
 	function head(){
 	?>
-	
 	<div id="event_reg_theme" class="wrap">
     	<div id="icon-options-event" class="icon32"></div>
     	<h2><?php echo _e('Manage MailChimp Integration Settings', 'event_espresso'); ?></h2>
-      
-				<div id="poststuff" class="metabox-holder has-right-sidebar">
-       
-				 <?php event_espresso_display_right_column(); ?>
-        
-					<div id="post-body">
-          <div id="post-body-content">			
-				     <div class="meta-box-sortables ui-sortables">
-							
-							<div class="metabox-holder">
-    		     <div class="postbox">
-					      <div title="Click to toggle" class="handlediv"><br /></div>
-    			    <h3 class="hndle"><?php _e('Mail Chimp Integration Settings','event_espresso'); ?></h3>
-    			    <div class="inside">
+    	<div class="metabox-holder">
+    		<div class="postbox">
+    			<h3><?php _e('Mail Chimp Integration Settings','event_espresso'); ?></h3>
+    			<div style="padding: 10px;">
     <?php
 	}
 	
@@ -116,25 +92,14 @@ class MailChimpView{
      */
 	function foot(){
 		?>
-				       </div><!-- / .inside -->
-    		   </div><!-- /.postbox -->
-    	   </div><!-- / .metabox-holder -->
-    
-
-			
-			<script type="text/javascript" charset="utf-8">
-			//<![CDATA[
-				jQuery(document).ready(function() {
-					postboxes.add_postbox_toggles('template_conf');
-      }); 
-			//]]>
-			</script>
-			  
-				 </div><!-- / .meta-box-sortables .ui-sortables -->
-			  </div><!-- / #post-body-content -->
-			 </div><!-- / #post-body -->
-			</div><!-- / #poststuff .metabox-holder -->
-		 </div><!-- / #wrap -->
+				</div>
+    		</div>
+    	</div>
+    </div>
+    <div id="api-key" style="display:none">
+    	<h2><?php _e("MailChimp API Key","event_espresso"); ?> </h2>
+    	<p><?php _e("If you do not have a MailChimp API key, please <a href='http://kb.mailchimp.com/article/where-can-i-find-my-api-key/' target='_blank'>click here</a> to learn how to create one. </p><p>An API key is required for this plugin.",'event-espresso');?> </p>
+    </div>
     <?php
 	}
 }

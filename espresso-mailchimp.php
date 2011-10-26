@@ -1,13 +1,13 @@
 <?php
-/**
+/*
 Plugin Name: Event Espresso - MailChimp Integration
 Plugin URI: http://www.eventespresso.com
 Description: A Mail Chimp integration addon for Event Espresso.
-Version: 1.0.1
+Version: 1.1
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as
+    it under the terms of the GNU General Public License, version 2, as 
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -20,7 +20,7 @@ Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/** Changelog
+/* Changelog
 1.0.1
 fixed some php shorttags, missing colons and a missing ?>
 ~c
@@ -36,26 +36,28 @@ function event_espresso_mailchimp_install(){
 	$sql="id int(11) NOT NULL AUTO_INCREMENT,
 	event_id INT(11) DEFAULT NULL,
 	attendee_id INT(11) DEFAULT NULL,
+	mailchimp_group_id VARCHAR(255) DEFAULT NULL,
 	mailchimp_list_id VARCHAR(75) DEFAULT NULL,
 	PRIMARY KEY (id)
 	";
 	event_espresso_run_install($table_name,$table_version,$sql);
-
+	
 	//Create a MailChimp / Event Relationship Table
 	$table_name="events_mailchimp_event_rel";
 	$table_version="1.0";
 	$sql="id int(11) NOT NULL AUTO_INCREMENT,
 	event_id INT(11) DEFAULT NULL,
 	mailchimp_list_id VARCHAR(75) DEFAULT NULL,
+    mailchimp_group_id VARCHAR(255) DEFAULT NULL,
 	PRIMARY KEY (id)
 	";
 	event_espresso_run_install($table_name,$table_version,$sql);
-
+	
 	//run install routines, setup basic Integration variables within the options environment.
 	add_option("event_mailchimp_active","true","","yes");
 	update_option("event_mailchimp_active","true");
 	add_option("event_mailchimp_settings","","","yes");
-
+	
 }
 
 function event_espresso_mailchimp_deactivate(){
@@ -70,4 +72,9 @@ register_deactivation_hook(__FILE__,"event_espresso_mailchimp_deactivate");
 //define some basic variables for the system.
 define("EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE",get_option('events_mailchimp_attendee_rel_tbl'));
 define("EVENTS_MAILCHIMP_EVENT_REL_TABLE", get_option('events_mailchimp_event_rel_tbl'));
-define("EVENT_MAILCHIMP_PLUGINPATH","/".plugin_basename(dirname('__FILENAME__'))."/");
+define("EVENT_MAILCHIMP_PLUGINPATH","/".plugin_basename(dirname(__FILENAME__))."/");
+
+wp_enqueue_script( 'ee-mailchimp-group', plugins_url( 'js/ajax-mailchimp.js', __FILE__ ) , array( 'jquery' ) );
+$mcconnic = new MailChimpController();
+add_action( 'wp_ajax_change-group', array( $mcconnic, 'get_groups') );
+add_action( 'wp_ajax_nopriv_change-group', array( $mcconnic, 'get_groups') );

@@ -1,6 +1,7 @@
 <?php
 class MailChimpController{
-	/**
+    
+    /**
      * Processes the MailChimp API Key request found at Event Espresso -> MailChimp Integration
      * No parameters are required.  
      *
@@ -76,7 +77,7 @@ class MailChimpController{
 			}
 			$api=new MCAPI($key,1);
 			$lists=$api->lists();
-			$listSelection="<label for='mailchimp-lists'>Select an available list</label><select id='mailchimp-lists' name='mailchimp_list_id'>";
+			$listSelection="<select id='mc_listid' name='mailchimp_list_id'>";
 			$listSelection.="<option value='0'>Do not send to MailChimp</option>";
 			foreach($lists["data"] as $listVars){
 				$selected=($listVars["id"]==$currentMailChimpID)?" selected":"";
@@ -84,8 +85,49 @@ class MailChimpController{
 			}
 			$listSelection.="</select>";
 		}
+        
 		return $listSelection;
 	}
+    
+    function get_groups( $listid = false ){
+        global $wpdb;
+        $echoit = ( $listid ) ? false : true;
+        $listid = ( $listid ) ? $listid : $_POST['mailchimp_list_id'];
+		$key=MailChimpController::get_valid_mailchimp_key();
+		$groupSelection=null;
+		$currentMailChimpID=null;
+		if(!is_array($key) && !empty($key)){
+			
+        $MailChimpRow=$wpdb->get_row("SELECT mailchimp_group_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id = '{$_REQUEST["event_id"]}'", ARRAY_A);
+        if(!empty($MailChimpRow)){
+            $currentMailChimpID=$MailChimpRow["mailchimp_group_id"];
+        }
+		
+        
+			$api=new MCAPI($key,1);
+			$groups=$api->listInterestGroupings( $listid );
+            
+			$groupSelection="<select name='mailchimp_group_id'>";
+			$groupSelection.="<option value='0'>Do not send to MailChimp group</option>";
+			foreach($groups as $group){
+				$groupSelection .= '<optgroup label="'.$group['name'].'">';
+                foreach( $group['groups'] as $listVars ){
+                    $groupid = $listVars["bit"].'-'.$group["id"].'-'.base64_encode( $listVars['name'] );
+                    $selected=($groupid ==$currentMailChimpID)?" selected='selected'":"";
+                    $groupSelection.="<option value='$groupid'$selected>{$listVars["name"]}</option>";
+                }
+                $groupSelection .= '</optgroup>';
+			}
+			$groupSelection.="</select>";
+		}
+		if( $echoit ){
+            echo $groupSelection;
+            exit;
+        }else{
+            return $groupSelection;
+        }
+        
+    }
 	
 	/**
      * Looks up the MailChimp List ID by the Event Espresso Event ID, within the events_mailchimp_event_rel table.  
@@ -98,9 +140,9 @@ class MailChimpController{
      */
 	function get_mailchimp_list_id_by_event($event_id){
 		global $wpdb;
-		$relationship=$wpdb->get_row("SELECT mailchimp_list_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id='$event_id'",ARRAY_A);
+		$relationship=$wpdb->get_row("SELECT mailchimp_list_id, mailchimp_group_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id='$event_id'",ARRAY_A);
 		if(!empty($relationship)){
-			return $relationship["mailchimp_list_id"];
+			return $relationship;
 		}else{
 			return false;
 		}
@@ -115,7 +157,7 @@ class MailChimpController{
      */
 	function add_event_list_rel($event_id){
 		global $wpdb;
-		$sql=array("event_id"=>$event_id,"mailchimp_list_id"=>$_REQUEST["mailchimp_list_id"]);
+		$sql=array("event_id"=>$event_id,"mailchimp_list_id"=>$_REQUEST["mailchimp_list_id"], "mailchimp_group_id" => $_REQUEST["mailchimp_group_id"]);
 		$wpdb->insert(EVENTS_MAILCHIMP_EVENT_REL_TABLE,$sql);
 	}
 	
@@ -132,7 +174,7 @@ class MailChimpController{
 		//if a relationship exists, update it.  Otherwise, create the relationship anew.
 		$currentListRelationship=$wpdb->get_row("SELECT event_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id = '$event_id'",ARRAY_A);
 		if(!empty($currentListRelationship)){
-			$data=array("mailchimp_list_id"=>$_REQUEST["mailchimp_list_id"]);
+			$data=array("mailchimp_list_id"=>$_REQUEST["mailchimp_list_id"], "mailchimp_group_id"=>$_REQUEST["mailchimp_group_id"]);
 			$where=array("event_id"=>$event_id);
 			$wpdb->update(EVENTS_MAILCHIMP_EVENT_REL_TABLE,$data,$where);
 		}else{
@@ -160,12 +202,22 @@ class MailChimpController{
 			//make certain the key is still valid with the MailChimp Servers
 			if(!is_array($mailChimpKey) && !empty($mailChimpKey)){
 				$api = new MCAPI($mailChimpKey);
-				$merge_vars = array("FNAME"=>$attendee_fname,"LNAME"=>$attendee_lname);
+				
 				//subscribe the attendee to the selected MailChimp list
-				$api->listSubscribe($mailChimpListID,$attendee_email,$merge_vars);
+                $groups_data = explode( '-', $mailChimpListID['mailchimp_group_id']);
+                if(  count( $groups_data ) > 1 ){
+                    $merge_vars = array("FNAME"=>$attendee_fname,"LNAME"=>$attendee_lname,
+                                        "GROUPINGS" => array(
+                                             array( "id" => $groups_data[1], "groups"=>base64_decode( $groups_data[2] ) ) )
+                                    );
+                }else{
+                    $merge_vars = array("FNAME"=>$attendee_fname,"LNAME"=>$attendee_lname );
+                }
+				$api->listSubscribe( $mailChimpListID['mailchimp_list_id'], $attendee_email, $merge_vars, 'html', true, false, false, true );
+                //print_r( $api );
 				if($api->errorCode==""){
 					//now create an attendee / mailchimp list relationshp for future backward integration
-					$sql=array("event_id"=>$event_id,"attendee_id"=>$attendee_id,"mailchimp_list_id"=>$mailChimpListID);
+					$sql=array("event_id"=>$event_id,"attendee_id"=>$attendee_id,"mailchimp_list_id"=>$mailChimpListID['mailchimp_list_id'], 'mailchimp_group_id'=>$mailChimpListID['mailchimp_group_id']);
 					$wpdb->insert(EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE,$sql);
 				}
 			}
