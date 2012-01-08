@@ -51,7 +51,7 @@ class MailChimpView{
 		//this will likely only happen if the API key is invalid, or has not been setup.
 		if(!empty($lists)){
 			?>
-			<div style="display: block;" id="mailchimp-options" class="postbox">
+			<div style="display: block;" id="mailchimp-options" class="postbox closed">
 			<div class="handlediv" title="Click to toggle"><br />
 			</div>
 			<h3 class="hndle"><span>
