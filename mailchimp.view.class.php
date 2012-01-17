@@ -58,7 +58,7 @@ class MailChimpView{
 			<?php _e('MailChimp List Integration','event_espresso'); ?>
 			</span></h3>
 			<div class="inside">
-                <p><?php echo $lists; ?>&nbsp;<a class="ev_reg-fancylink" href="#mailchimp-list-integration"><img src="<?php echo EVENT_ESPRESSO_PLUGINFULLURL; ?>/images/question-frame.png" width="16" height="16" /></a></p>
+                <p><?php echo $lists; ?> <?php apply_filters('espresso_help', 'mailchimp-list-integration'); ?></p>
                 <p id="mailchimp-groups">
                     
                 </p>
