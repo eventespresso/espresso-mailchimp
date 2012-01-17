@@ -98,27 +98,29 @@ class MailChimpController{
 		$currentMailChimpID=null;
 		if(!is_array($key) && !empty($key)){
 			
-        $MailChimpRow=$wpdb->get_row("SELECT mailchimp_group_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id = '{$_REQUEST["event_id"]}'", ARRAY_A);
-        if(!empty($MailChimpRow)){
-            $currentMailChimpID=$MailChimpRow["mailchimp_group_id"];
-        }
-		
-        
+			$MailChimpRow=$wpdb->get_row("SELECT mailchimp_group_id FROM ".EVENTS_MAILCHIMP_EVENT_REL_TABLE." WHERE event_id = '{$_REQUEST["event_id"]}'", ARRAY_A);
+			if(!empty($MailChimpRow)){
+				$currentMailChimpID=$MailChimpRow["mailchimp_group_id"];
+			}
+			
+			
 			$api=new MCAPI($key,1);
 			$groups=$api->listInterestGroupings( $listid );
-            
-			$groupSelection="<select name='mailchimp_group_id'>";
-			$groupSelection.="<option value='0'>Do not send to MailChimp group</option>";
-			foreach($groups as $group){
-				$groupSelection .= '<optgroup label="'.$group['name'].'">';
-                foreach( $group['groups'] as $listVars ){
-                    $groupid = $listVars["bit"].'-'.$group["id"].'-'.base64_encode( $listVars['name'] );
-                    $selected=($groupid ==$currentMailChimpID)?" selected='selected'":"";
-                    $groupSelection.="<option value='$groupid'$selected>{$listVars["name"]}</option>";
-                }
-                $groupSelection .= '</optgroup>';
+				
+			if (!empty($groups)) {
+				$groupSelection="<select name='mailchimp_group_id'>";
+				$groupSelection.="<option value='0'>Do not send to MailChimp group</option>";
+				foreach($groups as $group){
+					$groupSelection .= '<optgroup label="'.$group['name'].'">';
+					foreach( $group['groups'] as $listVars ){
+						$groupid = $listVars["bit"].'-'.$group["id"].'-'.base64_encode( $listVars['name'] );
+						$selected=($groupid ==$currentMailChimpID)?" selected='selected'":"";
+						$groupSelection.="<option value='$groupid'$selected>{$listVars["name"]}</option>";
+					}
+					$groupSelection .= '</optgroup>';
+				}
+				$groupSelection.="</select>";
 			}
-			$groupSelection.="</select>";
 		}
 		if( $echoit ){
             echo $groupSelection;
