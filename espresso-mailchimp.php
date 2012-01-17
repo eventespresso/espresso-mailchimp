@@ -72,7 +72,7 @@ register_deactivation_hook(__FILE__,"event_espresso_mailchimp_deactivate");
 //define some basic variables for the system.
 define("EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE",get_option('events_mailchimp_attendee_rel_tbl'));
 define("EVENTS_MAILCHIMP_EVENT_REL_TABLE", get_option('events_mailchimp_event_rel_tbl'));
-define("EVENT_MAILCHIMP_PLUGINPATH","/".plugin_basename(dirname(__FILENAME__))."/");
+define("EVENT_MAILCHIMP_PLUGINPATH","/".plugin_basename(dirname(__FILE__))."/");
 
 wp_enqueue_script( 'ee-mailchimp-group', plugins_url( 'js/ajax-mailchimp.js', __FILE__ ) , array( 'jquery' ) );
 $mcconnic = new MailChimpController();
