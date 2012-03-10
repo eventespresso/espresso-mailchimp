@@ -7,7 +7,7 @@ Version: 1.1
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -29,6 +29,10 @@ require_once("MCAPI.class.php"); //MailChimp API wrapper
 require_once("mailchimp.model.class.php"); //integration logic
 require_once("mailchimp.controller.class.php"); //WP integration routines
 require_once("mailchimp.view.class.php"); //Display routines for the mailchimp integration
+
+if(is_admin()) {
+	require_once('mailchimp_admin.php');
+}
 function event_espresso_mailchimp_install(){
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
@@ -41,7 +45,7 @@ function event_espresso_mailchimp_install(){
 	PRIMARY KEY (id)
 	";
 	event_espresso_run_install($table_name,$table_version,$sql);
-	
+
 	//Create a MailChimp / Event Relationship Table
 	$table_name="events_mailchimp_event_rel";
 	$table_version="1.0";
@@ -52,12 +56,12 @@ function event_espresso_mailchimp_install(){
 	PRIMARY KEY (id)
 	";
 	event_espresso_run_install($table_name,$table_version,$sql);
-	
+
 	//run install routines, setup basic Integration variables within the options environment.
 	add_option("event_mailchimp_active","true","","yes");
 	update_option("event_mailchimp_active","true");
 	add_option("event_mailchimp_settings","","","yes");
-	
+
 }
 
 function event_espresso_mailchimp_deactivate(){
