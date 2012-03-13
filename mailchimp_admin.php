@@ -17,4 +17,4 @@ function espresso_register_mailchimp_meta_boxes() {
 	}
 }
 
-add_action('current_screen', 'espresso_register_mailchimp_meta_boxes');
+add_action('current_screen', 'espresso_register_mailchimp_meta_boxes', 80);
