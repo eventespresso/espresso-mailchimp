@@ -80,7 +80,7 @@ define("EVENTS_MAILCHIMP_EVENT_REL_TABLE", get_option('events_mailchimp_event_re
 define("EVENT_MAILCHIMP_PLUGINPATH", "/" . plugin_basename(dirname(__FILE__)) . "/");
 
 function espresso_mailchimp_enqueue_scripts() {
-	wp_enqueue_script('ee-mailchimp-group', plugins_url('js/ajax-mailchimp.js', __FILE__), array('jquery'));
+	//wp_enqueue_script('ee-mailchimp-group', plugins_url('js/ajax-mailchimp.js', __FILE__), array('jquery'));
 }
 
 add_action('init', 'espresso_mailchimp_enqueue_scripts');

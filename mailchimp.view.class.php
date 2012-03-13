@@ -51,27 +51,26 @@ class MailChimpView {
 			$lists = MailChimpController::get_lists();
 			//do not display the mailchimp integration settings if there are no lists to display
 			//this will likely only happen if the API key is invalid, or has not been setup.
-			if (!empty($lists)) {
+
 				?>
-				<div style="display: block;" id="mailchimp-options" class="postbox closed">
-					<div class="handlediv" title="Click to toggle"><br />
-					</div>
-					<h3 class="hndle"><span>
-			<?php _e('MailChimp List Integration', 'event_espresso'); ?>
-						</span></h3>
 					<div class="inside">
-						<p><?php echo $lists; ?> <?php apply_filters('espresso_help', 'mailchimp-list-integration'); ?></p>
+						<p>
+							<?php
+							if (!empty($lists)) {
+								echo $lists;
+							}	else {
+								_e('You do not have any lists registered.', 'event_espresso');
+							} apply_filters('espresso_help', 'mailchimp-list-integration'); ?>
+						</p>
 						<p id="mailchimp-groups">
 
 						</p>
 					</div>
-				</div>
 				<div id="mailchimp-list-integration" style="display:none">
 					<h2><?php _e("MailChimp List Integration", "event_espresso"); ?> </h2>
 					<p><?php _e("The following information will be sent to the selected MailChimp list for future communications <ul><li>Registrant's First Name</li><li>Registrant's Last Name</li><li>Registrant's Email Address</li></ul>", 'event-espresso'); ?> </p>
 				</div>
 				<?php
-			}
 		}
 
 		/**
