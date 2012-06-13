@@ -84,7 +84,7 @@ class MailChimpView {
 				<div class="metabox-holder">
 					<div class="postbox">
 						<h3><?php _e('Mail Chimp Integration Settings', 'event_espresso'); ?></h3>
-						<div style="padding: 10px;">
+						
 							<?php
 						}
 
@@ -93,7 +93,6 @@ class MailChimpView {
 						 */
 						function foot() {
 							?>
-						</div>
 					</div>
 				</div>
 			</div>
