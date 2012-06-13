@@ -27,7 +27,6 @@
   ~c
  */
 require_once("MCAPI.class.php"); //MailChimp API wrapper
-require_once("mailchimp.model.class.php"); //integration logic
 require_once("mailchimp.controller.class.php"); //WP integration routines
 require_once("mailchimp.view.class.php"); //Display routines for the mailchimp integration
 
