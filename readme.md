@@ -1,15 +1,15 @@
-=== Event Espresso - MailChimp Integration ===
-Contributors: eventespresso, ivycat
-Tags: email, mailing list
-Requires at least: 3.5.1
-Tested up to: 3.5.1
-Stable tag: trunk
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+# Event Espresso - MailChimp Integration #
+**Contributors:** eventespresso, ivycat  
+**Tags:** email, mailing list  
+**Requires at least:** 3.5.1  
+**Tested up to:** 3.5.1  
+**Stable tag:** trunk  
+**License:** GPLv2 or later  
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
 This plugin integrates Event Espresso events with MailChimp lists and groups.
 
-== Installation ==
+## Installation ##
 
 Make sure you have installed the latest version of Event Espresso and the MailChimp addon, then complete the following steps to finish MailChimp integration.
 
@@ -23,16 +23,16 @@ At this point, the MailChimp Integration is complete. All new attendees will be 
 
 In addition, if an administrator creates an attendee for an event, that attendee will also be automatically subscribed to the MailChimp list selected above.
 
-== Changelog ==
+## Changelog ##
 
-= 1.1.1 =
+### 1.1.1 ###
 * Fixed MailChimp group subscription within lists.
 
-= 1.1.0 =
+### 1.1.0 ###
 * Added MailChimp group subscriptions.
 
-== Upgrade Notice ==
+## Upgrade Notice ##
 
-= 1.1.1 =
+### 1.1.1 ###
 Important bug fixes & new functionality - please upgrade!
 

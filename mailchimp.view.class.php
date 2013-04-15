@@ -1,5 +1,5 @@
 <?php
-class MailChimpView{
+class MailChimpView {
 	/**
      * Displays the administrator's MailChimp Integration configuration form to retrieve the MailChimp API Key
      *
@@ -7,19 +7,19 @@ class MailChimpView{
      * @param boolean $success, if true, will create a success message with the 'green_alert' stylesheet class.
      *
      */
-	function configuration($errors=null, $success=false){
+	function configuration( $errors = null, $success = false ) {
 		//define the current key.  If current key is now invalid, reset to null and display error
-		$currentKey=MailChimpController::get_valid_mailchimp_key();
-		if(MailChimpController::mailchimp_is_error($currentKey)) { 
-			$errors=$currentKey;
-			$currentKey=null;
+		$currentKey = MailChimpController::get_valid_mailchimp_key( );
+		if ( MailChimpController::mailchimp_is_error( $currentKey ) ) { 
+			$errors = apply_filters( 'event_espresso_mailchimp_config_errors', $currentKey );
+			$currentKey = null;
 		}
 		?>
 		 <form method="post" action="<?php echo $_SERVER['REQUEST_URI'];?>">
 		 <ul>
 		 <?php
 		 //if errors occurred, display them here.
-		 if(MailChimpController::mailchimp_is_error($errors)){
+		 if ( MailChimpController::mailchimp_is_error( $errors ) ) {
 		 	 echo "<li style='width: 40%' class='red_alert'>";
 			foreach($errors as $error){
 				echo "<p>$error</p>";
@@ -27,15 +27,17 @@ class MailChimpView{
 			echo "</li>";
 		}
 		//if the credentials were successfully modified with no errors, let the user know.
-		if($success){
+		if ( $success ) {
 			 echo "<li style='width: 40%' class='green_alert'>";
 			 echo "<p>MailChimp API Key Updated</p>";
 			 echo "</li>";
+			 do_action( 'event_espresso_mailchimp_config_success' );
 		}
 		?>
 		 <li>MailChimp API Key  <?php echo apply_filters('espresso_help', 'api-key-help') ?></li>
 		 <li><input size="45" type="text" name="mailchimp_api_key" value="<?php echo $currentKey; ?>" /></li>
 		 <li><input class="button-primary" name="update_mailchimp_settings_post" value="Save MailChimp API Key" type="submit" /></li>
+		 <?php do_action( 'event_espresso_mailchimp_settings_form' ); ?>
 		 </ul>
 		 </form>
     <?php ### help dialogue ### ?>
@@ -53,13 +55,41 @@ class MailChimpView{
      * Displays the Add Event / Update Event "MailChimp List Integration" option.  It will use the get_lists MailChimpController function to populate the dropdown.
      * If there are no lists within the MailChimp instance, or if the MailChimp integration has not been configured, nothing will be returned.
      */
-	function event_list_selection(){
+	function event_list_selection( ) {
 		//grab the lists from the MailChimp integration. 
-		$lists=MailChimpController::get_lists();
+		$lists = MailChimpController::get_lists( );
 		//do not display the mailchimp integration settings if there are no lists to display
 		//this will likely only happen if the API key is invalid, or has not been setup.
-		if(!empty($lists)){
-			?>
+		if ( ! empty( $lists ) ) {
+			do_action( 'event_espresso_mailchimp_pre_display_lists' ); ?>
+			<script type="text/javascript">
+				jQuery( 'document' ).ready(function( $ ){
+					if( $( '#mailchimp-lists :selected' ) ){
+						var selected = $( '#mailchimp-lists :selected' ).val();
+						var eventid = $( 'input[name="event_id"]' ).val();
+						display_mailchimp_group( selected, eventid );
+					}
+					
+					$( '#mailchimp-lists' ).change( function(){
+						 var list = $( this ).val();
+						 var eventid = $( 'input[name="event_id"]' ).val();
+						 display_mailchimp_group( list );
+					} );
+					
+					function display_mailchimp_group( list, eventid ){
+						$.post(ajaxurl,{
+							'action' : 'change-group',
+							'mailchimp_list_id' : list,
+							'event_id' : eventid
+						}, function( response ) {
+							if ( response !== '0' ) {
+								$('#mailchimp-groups').html(response);
+								$('#mailchimp-groups').show();
+							}
+						}, 'text' );
+					}
+				});
+			</script>
 			<div style="display: block;" id="mailchimp-options" class="postbox">
 			<div class="handlediv" title="Click to toggle"><br />
 			</div>
@@ -67,9 +97,14 @@ class MailChimpView{
 			<?php _e('MailChimp List Integration','event_espresso'); ?>
 			</span></h3>
 			<div class="inside">
-			 <p>
-			  <?php echo $lists; ?>
-			 </p>
+				<p>
+				  <?php echo $lists; ?>
+				</p>
+				<p id="mailchimp-groups">
+	                
+	        	</p><?php 
+					do_action( 'event_espresso_mailchimp_post_display_lists' );
+				?>
 			</div>
 			</div>
 			<?php ### help dialogue ### ?>
@@ -79,7 +114,6 @@ class MailChimpView{
 			  <p><?php _e("The following information will be sent to the selected MailChimp list for future communications <ul><li>Registrant's First Name</li><li>Registrant's Last Name</li><li>Registrant's Email Address</li></ul>",'event-espresso');?> </p>
 			 </div>
 			</div>
-			
 			<?php
         }
     }
@@ -87,7 +121,7 @@ class MailChimpView{
     /**
      * Displays the common "head" elements of the MailChimp Integration configuration view.
      */
-	function head(){
+	function head( ) {
 	?>
 		<div id="mailchimp-api" class="wrap">
 		  <div id="icon-options-event" class="icon32"></div>
@@ -106,7 +140,7 @@ class MailChimpView{
 	/**
      * Displays the common "footer" elements of the MailChimp Integration configuration view.
      */
-	function foot(){
+	function foot( ) {
 		?>
 				       </div><!-- / .inside -->
     		   </div><!-- /.postbox -->
@@ -116,16 +150,16 @@ class MailChimpView{
 			
 			<script type="text/javascript" charset="utf-8">
 			//<![CDATA[
-				jQuery(document).ready(function() {
-					postboxes.add_postbox_toggles('template_conf');
+				jQuery( 'document' ).ready( function( ) {
+					postboxes.add_postbox_toggles( 'template_conf' );
       }); 
 			//]]>
 			</script>
 			  
 				 </div><!-- / .meta-box-sortables .ui-sortables -->
 			<?php
-			$main_post_content = ob_get_clean();
-			espresso_choose_layout($main_post_content, event_espresso_display_right_column());
+			$main_post_content = ob_get_clean( );
+			espresso_choose_layout( $main_post_content, event_espresso_display_right_column( ) );
 			?>		
 		 </div><!-- / #wrap -->
     <?php
