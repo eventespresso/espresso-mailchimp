@@ -61,6 +61,7 @@ require_once( "mailchimp.view.class.php" ); //Display routines for the mailchimp
 function event_espresso_mailchimp_install( ) {
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
+	$table_version = "1.0.4";
 	$sql= apply_filters( 'event_espresso_attendee_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
@@ -68,10 +69,11 @@ function event_espresso_mailchimp_install( ) {
 		mailchimp_list_id VARCHAR(75) DEFAULT NULL,
 		PRIMARY KEY (id)"
 	);
-	event_espresso_run_install( $table_name, $sql );
+	event_espresso_run_install( $table_name, $table_version, $sql );
 
 	//Create a MailChimp / Event Relationship Table
 	$table_name = "events_mailchimp_event_rel";
+	$table_version = "1.0.3";
 	$sql = apply_filters( 'event_espresso_event_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
@@ -79,7 +81,7 @@ function event_espresso_mailchimp_install( ) {
 		mailchimp_group_id VARCHAR(255) DEFAULT NULL,
 		PRIMARY KEY (id)"
 	);
-	event_espresso_run_install( $table_name, $sql );
+	event_espresso_run_install( $table_name, $table_version, $sql );
 
 	//run install routines, setup basic Integration variables within the options environment.
 	add_option( "event_mailchimp_active", "true", "", "yes" );
@@ -106,8 +108,8 @@ register_activation_hook( __FILE__, "event_espresso_mailchimp_install" );
 register_deactivation_hook( __FILE__, "event_espresso_mailchimp_deactivate" );
 
 //define some basic variables for the system.
-define( "EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE", $wpdb->prefix . 'events_mailchimp_attendee_rel_tbl' );
-define( "EVENTS_MAILCHIMP_EVENT_REL_TABLE", $wpdb->prefix . 'events_mailchimp_event_rel_tbl'  );
+define( "EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE", get_option( 'events_mailchimp_attendee_rel_tbl' ) );
+define( "EVENTS_MAILCHIMP_EVENT_REL_TABLE", get_option( 'events_mailchimp_event_rel_tbl' ) );
 define( "EVENT_MAILCHIMP_PLUGINPATH", "/" . plugin_basename( dirname( '__FILENAME__' ) ) . "/" );
 
 // ajax to display groups when list is changed
