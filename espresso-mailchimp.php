@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - MailChimp Integration
 Plugin URI: http://www.eventespresso.com
 Description: A MailChimp integration addon for Event Espresso.
-Version: 1.1
+Version: 1.1-BETA
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
@@ -20,14 +20,6 @@ Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/** Changelog
-1.0.1
-fixed some php shorttags, missing colons and a missing ?>
-~c
-1.0.2
-added an if (!class_exists('MCAPI')) conditional to prevent conflicts with other plugins that use the MailChimp API
-*/
-
 //Update notifications
 add_action( 'action_hook_espresso_mailchimp_update_api', 'ee_mailchimp_load_pue_update' );
 function ee_mailchimp_load_pue_update( ) {
@@ -39,7 +31,7 @@ function ee_mailchimp_load_pue_update( ) {
 		require( EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php' );
 		$api_key = $org_options['site_license_key'];
 		$host_server_url = 'http://eventespresso.com';
-		$plugin_slug = 'espresso-mailchimp';
+		$plugin_slug = 'espresso-mailchimp-pr';
 		$options = array(
 			'apikey' 			=> $api_key,
 			'lang_domain' 		=> 'event_espresso',
@@ -61,7 +53,7 @@ require_once( "mailchimp.view.class.php" ); //Display routines for the mailchimp
 function event_espresso_mailchimp_install( ) {
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
-	$table_version = "1.1";
+	$table_version = "1.1-BETA";
 	$sql= apply_filters( 'event_espresso_attendee_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
@@ -73,7 +65,7 @@ function event_espresso_mailchimp_install( ) {
 
 	//Create a MailChimp / Event Relationship Table
 	$table_name = "events_mailchimp_event_rel";
-	$table_version = "1.1";
+	$table_version = "1.1-BETA";
 	$sql = apply_filters( 'event_espresso_event_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
