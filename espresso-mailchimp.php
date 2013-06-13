@@ -100,6 +100,7 @@ register_activation_hook( __FILE__, "event_espresso_mailchimp_install" );
 register_deactivation_hook( __FILE__, "event_espresso_mailchimp_deactivate" );
 
 //define some basic variables for the system.
+global $wpdb;
 define( "EVENTS_MAILCHIMP_ATTENDEE_REL_TABLE", $wpdb->prefix."events_mailchimp_attendee_rel" );
 define( "EVENTS_MAILCHIMP_EVENT_REL_TABLE", $wpdb->prefix."events_mailchimp_event_rel" );
 define( "EVENT_MAILCHIMP_PLUGINPATH", "/" . plugin_basename( dirname( '__FILENAME__' ) ) . "/" );
