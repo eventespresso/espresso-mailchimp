@@ -54,6 +54,11 @@ function event_espresso_mailchimp_install( ) {
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
 	$table_version = "1.1";
+	
+	if ( ! function_exists( 'event_espresso_run_install' )) {
+		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
+	}
+	
 	$sql= apply_filters( 'event_espresso_attendee_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
