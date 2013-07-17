@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - MailChimp Integration
 Plugin URI: http://www.eventespresso.com
 Description: A MailChimp integration addon for Event Espresso.
-Version: 1.1
+Version: 1.1.b
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
@@ -31,13 +31,18 @@ function ee_mailchimp_load_pue_update( ) {
 		require( EVENT_ESPRESSO_PLUGINFULLPATH . 'class/pue/pue-client.php' );
 		$api_key = $org_options['site_license_key'];
 		$host_server_url = 'http://eventespresso.com';
-		$plugin_slug = 'espresso-mailchimp';
+		$plugin_slug = array(
+			'premium' => array('p' => 'espresso-mailchimp'),
+			'prerelease' => array('b' => 'espresso-mailchimp-pr')
+			);
 		$options = array(
 			'apikey' 			=> $api_key,
 			'lang_domain' 		=> 'event_espresso',
 			'checkPeriod' 		=> '24',
 			'option_key' 		=> 'site_license_key',
-			'options_page_slug' => 'event_espresso'
+			'options_page_slug' => 'event_espresso',
+			'plugin_basename' => plugin_basename(dirname(__FILE__)),
+			'use_wp_update' => FALSE, //if TRUE then you want FREE versions of the plugin to be updated from WP
 		);
 		do_action( 'event_espresso_mailchimp_pre_update_check' );
 		$check_for_updates = new PluginUpdateEngineChecker( $host_server_url, $plugin_slug, $options ); //initiate the class and start the plugin update engine!
@@ -53,7 +58,7 @@ require_once( "mailchimp.view.class.php" ); //Display routines for the mailchimp
 function event_espresso_mailchimp_install( ) {
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
-	$table_version = "1.1";
+	$table_version = "1.1.b";
 	
 	if ( ! function_exists( 'event_espresso_run_install' )) {
 		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
