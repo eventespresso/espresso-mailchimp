@@ -41,7 +41,7 @@ function ee_mailchimp_load_pue_update( ) {
 			'checkPeriod' 		=> '24',
 			'option_key' 		=> 'site_license_key',
 			'options_page_slug' => 'event_espresso',
-			'plugin_basename' => plugin_basename(dirname(__FILE__)),
+			'plugin_basename' => plugin_basename(__FILE__),
 			'use_wp_update' => FALSE, //if TRUE then you want FREE versions of the plugin to be updated from WP
 		);
 		do_action( 'event_espresso_mailchimp_pre_update_check' );
