@@ -252,13 +252,14 @@ class MailChimpController {
 					$mailChimpListID,
 					$api 
 				);
+				
 				$groups_data = explode( '-', $mailChimpListID['mailchimp_group_id'] );
-				if( 0 < count( $mailChimpListID['mailchimp_group_id'] ) ) :
+				if( 1 < count( $groups_data ) ) {
 					$merge_vars["GROUPINGS"] = array(
 			            array( "id" => $groups_data[1], "groups" => base64_decode( $groups_data[2] ) )
 			        );
-					
-				endif;
+				}
+				
 				//subscribe the attendee to the selected MailChimp list
 				$api->listSubscribe( $mailChimpListID['mailchimp_list_id'], $attendee_email, $merge_vars );
 				do_action( 
@@ -268,8 +269,9 @@ class MailChimpController {
 					$mailChimpListID, 
 					$api 
 				);
+
 				// if the user exists subscribe will fail, add group to existing subscription
-				if ( $api->errorCode = '214' ) {
+				if ( $api->errorCode = '214' && 1 < count( $groups_data ) ) {
 					$merge_vars["GROUPINGS"] = array(
 			       				array( 
 								"id" => $groups_data[1],
