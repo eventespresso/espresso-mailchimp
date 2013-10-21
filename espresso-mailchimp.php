@@ -68,7 +68,8 @@ function event_espresso_mailchimp_install( ) {
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
 		attendee_id INT(11) DEFAULT NULL,
-		mailchimp_list_id VARCHAR(75) DEFAULT NULL"
+		mailchimp_list_id VARCHAR(75) DEFAULT NULL,
+		PRIMARY KEY  (id)"
 	);
 	event_espresso_run_install( $table_name, $table_version, $sql );
 
@@ -79,7 +80,8 @@ function event_espresso_mailchimp_install( ) {
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
 		mailchimp_list_id VARCHAR(75) DEFAULT NULL,
-		mailchimp_group_id VARCHAR(255) DEFAULT NULL"
+		mailchimp_group_id VARCHAR(255) DEFAULT NULL,
+		PRIMARY KEY  (id)"
 	);
 	event_espresso_run_install( $table_name, $table_version, $sql );
 
