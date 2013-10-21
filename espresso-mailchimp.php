@@ -64,24 +64,22 @@ function event_espresso_mailchimp_install( ) {
 		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
 	}
 	
-	$sql= apply_filters( 'event_espresso_attendee_rel_sql', 
+	$sql= apply_filters( 'events_mailchimp_attendee_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
 		attendee_id INT(11) DEFAULT NULL,
-		mailchimp_list_id VARCHAR(75) DEFAULT NULL,
-		PRIMARY KEY (id)"
+		mailchimp_list_id VARCHAR(75) DEFAULT NULL"
 	);
 	event_espresso_run_install( $table_name, $table_version, $sql );
 
 	//Create a MailChimp / Event Relationship Table
 	$table_name = "events_mailchimp_event_rel";
 	$table_version = "1.1";
-	$sql = apply_filters( 'event_espresso_event_rel_sql', 
+	$sql = apply_filters( 'events_mailchimp_event_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
 		mailchimp_list_id VARCHAR(75) DEFAULT NULL,
-		mailchimp_group_id VARCHAR(255) DEFAULT NULL,
-		PRIMARY KEY (id)"
+		mailchimp_group_id VARCHAR(255) DEFAULT NULL"
 	);
 	event_espresso_run_install( $table_name, $table_version, $sql );
 
