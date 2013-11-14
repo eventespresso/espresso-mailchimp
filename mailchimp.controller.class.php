@@ -320,6 +320,8 @@ class MailChimpController {
 		if (empty($test)) {
 			$wpdb->query( "ALTER TABLE {$wpdb->prefix}events_mailchimp_event_rel ADD column mailchimp_group_id VARCHAR(255) NULL DEFAULT NULL AFTER event_id" );
 			update_option( 'ee-mailchimp-group_id_set', true );
+		}else{
+			update_option( 'ee-mailchimp-group_id_set', true );
 		}
 	}
 }
