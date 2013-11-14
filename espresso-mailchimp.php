@@ -75,7 +75,7 @@ function event_espresso_mailchimp_install( ) {
 
 	//Create a MailChimp / Event Relationship Table
 	$table_name = "events_mailchimp_event_rel";
-	$table_version = "1.1";
+	$table_version = "1.2";
 	$sql = apply_filters( 'events_mailchimp_event_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
@@ -88,6 +88,7 @@ function event_espresso_mailchimp_install( ) {
 	//run install routines, setup basic Integration variables within the options environment.
 	add_option( "event_mailchimp_active", "true", "", "yes" );
 	update_option( "event_mailchimp_active", "true" );
+	update_option( 'ee-mailchimp-group_id_set', true );
 	
 	// commented out below: when activating, this removes the API key already entered
 	// this happens when WordPress updates, deactivates and re-activates the plugin as well.
