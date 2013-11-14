@@ -314,10 +314,10 @@ class MailChimpController {
 		if( get_option( 'ee-mailchimp-group_id_set' ) )
 			return;
 		global $wpdb;
-		$sql = "SELECT count( * ) FROM information_schema.COLUMNS WHERE COLUMN_NAME='mailchimp_group_id'
-		AND ( `TABLE_NAME` = '{$wpdb->prefix}events_mailchimp_event_rel' )";
 		
-		if( 1 != $wpdb->get_var( $sql ) ){
+		$sql = "SHOW COLUMNS FROM {$wpdb->prefix}events_mailchimp_event_rel LIKE 'mailchimp_group_id';";
+		$test = $wpdb->query($sql);
+		if (empty($test)) {
 			$wpdb->query( "ALTER TABLE {$wpdb->prefix}events_mailchimp_event_rel ADD column mailchimp_group_id VARCHAR(255) NULL DEFAULT NULL AFTER event_id" );
 			update_option( 'ee-mailchimp-group_id_set', true );
 		}

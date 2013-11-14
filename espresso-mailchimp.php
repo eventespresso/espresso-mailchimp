@@ -88,7 +88,7 @@ function event_espresso_mailchimp_install( ) {
 	//run install routines, setup basic Integration variables within the options environment.
 	add_option( "event_mailchimp_active", "true", "", "yes" );
 	update_option( "event_mailchimp_active", "true" );
-	update_option( 'ee-mailchimp-group_id_set', true );
+	//update_option( 'ee-mailchimp-group_id_set', true );
 	
 	// commented out below: when activating, this removes the API key already entered
 	// this happens when WordPress updates, deactivates and re-activates the plugin as well.
