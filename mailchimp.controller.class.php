@@ -1,4 +1,6 @@
 <?php
+use EEA\MCAPI;
+
 class MailChimpController {
 
 	function __construct( ) {
@@ -19,12 +21,17 @@ class MailChimpController {
 			return array( "An API Key is Required." );
 		}
 		//test the API to make certain it is valid
-		$api = new MCAPI( $apikey, 1 );
-		$api->lists( );
-		
-		if ( $api->errorCode != "" ) {
+		try {
+			$api = new MCAPI( $apikey, 1 );
+			$reply = $api->get('');
+		} catch ( Exception $e ) {
 			return array( "An error occurred while attempting to connect to the MailChimp server.  
-				Error: $api->errorMessage" );
+				Error:" . $e->getMessage() );
+		}
+		
+		if ( ! $api->success() || ! isset($reply['account_id']) ) {
+			return array( "An error occurred while attempting to connect to the MailChimp server.  
+				Error:" . $api->getLastError() );
 		}
 		//now that we know the API key is valid, enter it into the system for future use.
 		$mailchimp_api_settings['apikey'] = $apikey;
@@ -45,11 +52,16 @@ class MailChimpController {
 		//check to make sure this is not the initial configuration
 		$settings = get_option( "event_mailchimp_settings" ); 
 		if ( ! empty( $settings["apikey"] ) ) {
-			$api = new MCAPI( $settings["apikey"], 1 );
-			$api->lists( );
+			try {
+				$api = new MCAPI( $settings["apikey"] );
+				$reply = $api->get('');
+			} catch ( Exception $e ) {
+				return array( "The API Key previously used ({$settings["apikey"]}) is no longer valid.  
+					Please enter a new API key." );
+			}
 			//if the current key is no longer valid, reset the key to null and return an error to the user, requesting a new key.  Otherwise
 			//return the current key.
-			if ( $api->errorCode !== "" ) {
+			if ( ! $api->success() || ! isset($reply['account_id']) ) {
 				update_option( "event_mailchimp_settings", array( "apikey","" ) );
 				return array( "The API Key previously used ({$settings["apikey"]}) is no longer valid.  
 					Please enter a new API key." );
@@ -85,13 +97,18 @@ class MailChimpController {
 				$MailChimpListID = $wpdb->get_var( $sql );
 			}
 
-			$api = new MCAPI( $key, 1 );
-			$lists = $api->lists( );
+			try {
+				$api = new MCAPI( $key );
+				$lists = $api->get('lists', array('count' => 100));
+			} catch ( Exception $e ) {
+				return null;
+			}
+			if ( ! $api->success() || ! isset($lists['lists']) ) return null;
 
 			$listSelection = "<label for='mailchimp-lists'>Select an available list " . apply_filters('espresso_help', 'mailchimp-list-integration') . "</label><select id='mailchimp-lists' name='mailchimp_list_id'>";
 			$listSelection .= "<option value='0'>Do not send to MailChimp</option>";
 			
-			foreach( $lists["data"] as $listVars ) {
+			foreach( $lists["lists"] as $listVars ) {
 				$selected = ( $listVars["id"] == $MailChimpListID ) ? " selected" : "";
 				$listSelection .= "<option value='{$listVars["id"]}'$selected>{$listVars["name"]}</option>";
 			}
@@ -123,16 +140,27 @@ class MailChimpController {
 			else:
             	$MailChimpGroupID = false;
             endif;
-			$api = new MCAPI( $key, 1 );
-			$groups = $api->listInterestGroupings( $listid );
+            try {
+				$api = new MCAPI( $key );
+				$groups = $api->get('lists/'.$listid.'/interest-categories', array('count' => 50));
+			} catch ( Exception $e ) {
+				return null;
+			}
+			if ( ! $api->success() || ! isset($groups['categories']) ) return null;
 
-			if( $groups && count( $groups > 0 ) ):
+			if ( count( $groups['categories'] > 0 ) ):
 				$groupSelection="<select name='mailchimp_group_id'>";
 				$groupSelection.="<option value='0'>Do not send to MailChimp group</option>";
-				foreach ( $groups as $group ) {
-					$groupSelection .= '<optgroup label="'.$group['name'].'">';
-					foreach ( $group['groups'] as $listVars ) {
-						$groupid = $listVars["bit"] . '-' . $group["id"] .'-' . base64_encode( $listVars['name'] );
+				foreach ( $groups['categories'] as $group ) {
+					$groupSelection .= '<optgroup label="'.$group['title'].'">';
+					try {
+						$reply = $api->get( 'lists/'.$listid.'/interest-categories/'.$group['id'].'/interests', array('count' => 100) );
+					} catch ( Exception $e ) {
+						continue;
+					}
+					if ( ! $api->success() || ! isset($reply['interests']) ) continue;
+					foreach ( $reply['interests'] as $listVars ) {
+						$groupid = $listVars["id"] . '-' . $group["id"] .'-' . base64_encode( $listVars['name'] );
 						$selected = ( $groupid == $MailChimpGroupID ) ? " selected='selected'":"";
 						$groupSelection .= "<option value='$groupid'$selected>{$listVars["name"]}</option>";
 					}
@@ -242,11 +270,19 @@ class MailChimpController {
 			$mailChimpKey=MailChimpController::get_valid_mailchimp_key( );
 			//make certain the key is still valid with the MailChimp Servers
 			if ( ! is_array( $mailChimpKey ) && ! empty( $mailChimpKey ) ) {
-				$api = new MCAPI( $mailChimpKey );
+				try {
+					$api = new MCAPI( $mailChimpKey );
+				} catch ( Exception $e ) {
+					return array( "There was an error while trying to load the MCAPI." . $e->getMessage() );
+				}
 				apply_filters( 'event_espresso_mailchimp_list_subscribe_merge_vars', 
-					$merge_vars = array( 
-						"FNAME" => $attendee_fname,
-						"LNAME" => $attendee_lname 
+					$merge_vars = array(
+						"merge_fields" => array(
+							"FNAME" => $attendee_fname,
+							"LNAME" => $attendee_lname
+						),
+						"email_address" => $attendee_email,
+						"status_if_new" => 'pending'	// Opt-in required.
 					),
 					$event_id,
 					$mailChimpListID,
@@ -254,14 +290,36 @@ class MailChimpController {
 				);
 				
 				$groups_data = explode( '-', $mailChimpListID['mailchimp_group_id'] );
-				if( 1 < count( $groups_data ) ) {
-					$merge_vars["GROUPINGS"] = array(
-			            array( "id" => $groups_data[1], "groups" => base64_decode( $groups_data[2] ) )
-			        );
+				if ( 1 < count( $groups_data ) ) {
+					$merge_vars["interests"][$groups_data[0]] = true;
 				}
-				
-				//subscribe the attendee to the selected MailChimp list
-				$api->listSubscribe( $mailChimpListID['mailchimp_list_id'], $attendee_email, $merge_vars );
+
+				//need to pass all other interests also to tell MC that these are Not for this subscription
+				//in case the user was already subscribed to any he will be unsubscribed from the old group and a new group will be used
+				$api_error = false;
+				 try {
+					$groups = $api->get('lists/'.$mailChimpListID['mailchimp_list_id'].'/interest-categories', array('count' => 50));
+				} catch ( Exception $e ) {
+					$api_error = array( "There was an error while trying to request List interest Categories." . $e->getMessage() );
+				}
+				if ( ! $api_error && $api->success() && isset($groups['categories']) && count( $groups['categories'] > 0 ) ):
+					foreach ( $groups['categories'] as $group ) {
+						try {
+							$reply = $api->get( 'lists/'.$mailChimpListID['mailchimp_list_id'].'/interest-categories/'.$group['id'].'/interests', array('count' => 100) );
+						} catch ( Exception $e ) {
+							continue;
+						}
+						if ( ! $api->success() || ! isset($reply['interests']) ) continue;
+						foreach ( $reply['interests'] as $listVars ) {
+							if ( $groups_data[0] !== $listVars["id"] ) {
+								$merge_vars["interests"][$listVars["id"]] = false;
+							}
+						}
+					}
+				endif;
+
+				//subscribe/update the attendee to the selected MailChimp list
+				$put_member = $api->put( '/lists/'.$mailChimpListID['mailchimp_list_id'].'/members/'.$api->subscriberHash($attendee_email), $merge_vars );
 				do_action( 
 					'event_espresso_mailchimp_list_subscribe',
 					$event_id, 
@@ -270,19 +328,7 @@ class MailChimpController {
 					$api 
 				);
 
-				// if the user exists subscribe will fail, add group to existing subscription
-				if ( $api->errorCode = '214' && 1 < count( $groups_data ) ) {
-					$merge_vars["GROUPINGS"] = array(
-			       				array( 
-								"id" => $groups_data[1],
-								"groups" => base64_decode( $groups_data[2] )
-								)
-							);
-					$api->listUpdateMember( $mailChimpListID['mailchimp_list_id'], $attendee_email, $merge_vars, 'html', false );
-					
-				}
-			
-				if ( $api->errorCode == "" ) {
+				if ( $api->success() ) {
 					//now create an attendee / mailchimp list relationshp for future backward integration
 					$sql = apply_filters( 'event_espresso_mailchimp_list_subscribe_insert', 
 						array( 
