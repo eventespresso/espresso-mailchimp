@@ -160,7 +160,7 @@ class MailChimpController {
 					}
 					if ( ! $api->success() || ! isset($reply['interests']) ) continue;
 					foreach ( $reply['interests'] as $listVars ) {
-						$groupid = $listVars["id"] . '-' . $group["id"] .'-' . base64_encode( $listVars['name'] );
+						$groupid = $listVars["id"] . '-' . $group["id"] .'-' . base64_encode( $listVars['name'] ) . '-true';
 						$selected = ( $groupid == $MailChimpGroupID ) ? " selected='selected'":"";
 						$groupSelection .= "<option value='$groupid'$selected>{$listVars["name"]}</option>";
 					}
@@ -290,7 +290,7 @@ class MailChimpController {
 				);
 				
 				$groups_data = explode( '-', $mailChimpListID['mailchimp_group_id'] );
-				if ( 1 < count( $groups_data ) ) {
+				if ( 1 < count( $groups_data ) && isset($groups_data[3]) && $groups_data[3] === 'true' ) {
 					$merge_vars["interests"][$groups_data[0]] = true;
 				}
 
