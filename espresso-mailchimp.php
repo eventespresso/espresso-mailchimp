@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - MailChimp Integration
 Plugin URI: http://www.eventespresso.com
 Description: A MailChimp integration addon for Event Espresso.
-Version: 1.3
+Version: 1.3.p
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
