@@ -3,7 +3,7 @@
 Plugin Name: Event Espresso - MailChimp Integration
 Plugin URI: http://www.eventespresso.com
 Description: A MailChimp integration addon for Event Espresso.
-Version: 1.2
+Version: 1.3
 Usage: Configure the MailChimp API credentials under Event Espresso -> MailChimp integration.  When creating/updating an event, select the Mail Chimp list you would like to integrate with.
 
     This program is free software; you can redistribute it and/or modify
@@ -58,7 +58,7 @@ require_once( "mailchimp.view.class.php" ); //Display routines for the mailchimp
 function event_espresso_mailchimp_install( ) {
 	//Create a MailChimp / Attendee relationship table
 	$table_name="events_mailchimp_attendee_rel";
-	$table_version = "1.2";
+	$table_version = "1.3";
 	
 	if ( ! function_exists( 'event_espresso_run_install' )) {
 		require_once( EVENT_ESPRESSO_PLUGINFULLPATH . 'includes/functions/database_install.php' ); 		
@@ -75,7 +75,7 @@ function event_espresso_mailchimp_install( ) {
 
 	//Create a MailChimp / Event Relationship Table
 	$table_name = "events_mailchimp_event_rel";
-	$table_version = "1.2";
+	$table_version = "1.3";
 	$sql = apply_filters( 'events_mailchimp_event_rel_sql', 
 		"id int(11) NOT NULL AUTO_INCREMENT,
 		event_id INT(11) DEFAULT NULL,
