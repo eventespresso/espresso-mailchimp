@@ -7,7 +7,7 @@ class MailChimpView {
      * @param boolean $success, if true, will create a success message with the 'green_alert' stylesheet class.
      *
      */
-	function configuration( $errors = null, $success = false ) {
+	public static function configuration( $errors = null, $success = false ) {
 		//define the current key.  If current key is now invalid, reset to null and display error
 		$currentKey = MailChimpController::get_valid_mailchimp_key( );
 		if ( MailChimpController::mailchimp_is_error( $currentKey ) ) { 
@@ -55,7 +55,7 @@ class MailChimpView {
      * Displays the Add Event / Update Event "MailChimp List Integration" option.  It will use the get_lists MailChimpController function to populate the dropdown.
      * If there are no lists within the MailChimp instance, or if the MailChimp integration has not been configured, nothing will be returned.
      */
-	function event_list_selection( ) {
+	public static function event_list_selection( ) {
 		//grab the lists from the MailChimp integration. 
 		$lists = MailChimpController::get_lists( );
 		//do not display the mailchimp integration settings if there are no lists to display
@@ -121,7 +121,7 @@ class MailChimpView {
     /**
      * Displays the common "head" elements of the MailChimp Integration configuration view.
      */
-	function head( ) {
+	public static function head( ) {
 	?>
 		<div id="mailchimp-api" class="wrap">
 		  <div id="icon-options-event" class="icon32"></div>
@@ -140,8 +140,8 @@ class MailChimpView {
 	/**
      * Displays the common "footer" elements of the MailChimp Integration configuration view.
      */
-	function foot( ) {
-		?>
+	public static function foot( ) {
+	?>
 				       </div><!-- / .inside -->
     		   </div><!-- /.postbox -->
     	   </div><!-- / .metabox-holder -->

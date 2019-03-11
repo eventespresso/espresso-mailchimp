@@ -13,7 +13,7 @@ class MailChimpController {
      * @return array on error.  Typical errors include: invalid API Key, or No API Key provided.  On Success, MailChimp Integration settings are updated
      * with the new API key.
      */
-	function update_mailchimp_settings( ) {
+	public static function update_mailchimp_settings( ) {
 		//configuration variable in options - event_mailchimp_settings
 		//check that the API key was provided.  If not, return with error a14ef9f5c44342442a3a18f89b46149e-us2
 		$apikey = trim( $_REQUEST["mailchimp_api_key"] );
@@ -48,7 +48,7 @@ class MailChimpController {
      * @return string containing the API key on success.  On Error, return array with the corresponding error message.
      * 
      */
-	function get_valid_mailchimp_key( ) {
+	public static function get_valid_mailchimp_key( ) {
 		//check to make sure this is not the initial configuration
 		$settings = get_option( "event_mailchimp_settings" ); 
 		if ( ! empty( $settings["apikey"] ) ) {
@@ -81,7 +81,7 @@ class MailChimpController {
      * If the API key is no longer valid, return nothing.  This avoids an empty MailChimp List Integration option within the Add / Edit Event dialogs.
      * 
      */
-	function get_lists( ) {
+	public static function get_lists( ) {
 		global $wpdb;
 		$key = MailChimpController::get_valid_mailchimp_key( );
 		$listSelection = null;
@@ -117,7 +117,7 @@ class MailChimpController {
 		return $listSelection;
 	}
 	
-	public function get_groups( $listid = false ) {
+	public static function get_groups( $listid = false ) {
         global $wpdb;
         MailChimpController::ensure_group_row_table();
         $echoit = ( $listid ) ? false : true;
@@ -187,7 +187,7 @@ class MailChimpController {
      * if no MailChimp List ID is associated with the event ID, return boolean false.
      * 
      */
-	function get_mailchimp_list_id_by_event( $event_id ) {
+	public static function get_mailchimp_list_id_by_event( $event_id ) {
 		global $wpdb;
 		$sql = apply_filters( 'event_espresso_mailchimp_get_list_id_by_event_sql', 
 			$wpdb->prepare( "SELECT mailchimp_list_id, mailchimp_group_id FROM " . EVENTS_MAILCHIMP_EVENT_REL_TABLE ." 
@@ -206,7 +206,7 @@ class MailChimpController {
      * @param string $event_id
      * 
      */
-	function add_event_list_rel( $event_id ) {
+	public static function add_event_list_rel( $event_id ) {
 		global $wpdb;
 		$sql= apply_filters( 
 			'event_espresso_mailchimp_add_event_list_rel_insert_array', 
@@ -226,7 +226,7 @@ class MailChimpController {
      * @param string $event_id
      * 
      */
-	function update_event_list_rel( $event_id ) {
+	public static function update_event_list_rel( $event_id ) {
 		global $wpdb;
 		MailChimpController::ensure_group_row_table();
 		do_action( 'event_espresso_mailchimp_update_event_list_rel', $event_id, $_REQUEST );
@@ -262,7 +262,7 @@ class MailChimpController {
      * @param string $attendee_email Event Espresso new Attendee Email Address
      * 
      */
-	function list_subscribe( $event_id, $attendee_id, $attendee_fname, $attendee_lname, $attendee_email ) {
+	public static function list_subscribe( $event_id, $attendee_id, $attendee_fname, $attendee_lname, $attendee_email ) {
 		global $wpdb;
 		$mailChimpListID = MailChimpController::get_mailchimp_list_id_by_event( $event_id );
 		//check to make sure the list ID is valid and available
@@ -288,7 +288,7 @@ class MailChimpController {
 					$mailChimpListID,
 					$api 
 				);
-				
+
 				$groups_data = explode( '-', $mailChimpListID['mailchimp_group_id'] );
 				if ( 1 < count( $groups_data ) && isset($groups_data[3]) && $groups_data[3] === 'true' ) {
 					$merge_vars["interests"][$groups_data[0]] = true;
@@ -302,7 +302,7 @@ class MailChimpController {
 				} catch ( Exception $e ) {
 					$api_error = array( "There was an error while trying to request List interest Categories." . $e->getMessage() );
 				}
-				if ( ! $api_error && $api->success() && isset($groups['categories']) && count( $groups['categories'] > 0 ) ):
+				if ( ! $api_error && $api->success() && !empty($groups['categories']) && count( $groups['categories'] > 0 ) ):
 					foreach ( $groups['categories'] as $group ) {
 						try {
 							$reply = $api->get( 'lists/'.$mailChimpListID['mailchimp_list_id'].'/interest-categories/'.$group['id'].'/interests', array('count' => 100) );
@@ -350,13 +350,13 @@ class MailChimpController {
 	*
 	* @return boolean true if $process is an array.  boolean false if $process is not an array.
 	*/
-	function mailchimp_is_error( $process ) {
+	public static function mailchimp_is_error( $process ) {
 		if ( is_array( $process ) ) 
 			return true;
 		return false;
 	}
 
-	protected function ensure_group_row_table(){
+	protected static function ensure_group_row_table(){
 		if( get_option( 'ee-mailchimp-group_id_set' ) )
 			return;
 		global $wpdb;
