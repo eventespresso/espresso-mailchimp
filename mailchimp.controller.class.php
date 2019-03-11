@@ -86,6 +86,7 @@ class MailChimpController {
 		$key = MailChimpController::get_valid_mailchimp_key( );
 		$listSelection = null;
 		$currentMailChimpID = null;
+		$MailChimpListID = null;
 		if ( ! is_array( $key ) && ! empty( $key ) ) {
 			//if the user is editing an existing event, get the previously selected MailChimp List ID
 			if ( $_REQUEST["action"] == "edit" && $_REQUEST["page"] == "events" ) {
