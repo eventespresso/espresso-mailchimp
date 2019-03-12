@@ -278,8 +278,8 @@ class MailChimpController {
 				} catch ( Exception $e ) {
 					return array( "There was an error while trying to load the MCAPI." . $e->getMessage() );
 				}
-				apply_filters( 'event_espresso_mailchimp_list_subscribe_merge_vars', 
-					$merge_vars = array(
+				$merge_vars = apply_filters( 'event_espresso_mailchimp_list_subscribe_merge_vars', 
+					array(
 						"merge_fields" => array(
 							"FNAME" => $attendee_fname,
 							"LNAME" => $attendee_lname
