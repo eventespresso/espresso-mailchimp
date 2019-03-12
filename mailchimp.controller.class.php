@@ -149,7 +149,7 @@ class MailChimpController {
 			}
 			if ( ! $api->success() || ! isset($groups['categories']) ) return null;
 
-			if ( count( $groups['categories'] > 0 ) ):
+			if ( !empty($groups['categories']) ):
 				$groupSelection="<select name='mailchimp_group_id'>";
 				$groupSelection.="<option value='0'>Do not send to MailChimp group</option>";
 				foreach ( $groups['categories'] as $group ) {
@@ -305,7 +305,7 @@ class MailChimpController {
 				} catch ( Exception $e ) {
 					$api_error = array( "There was an error while trying to request List interest Categories." . $e->getMessage() );
 				}
-				if ( ! $api_error && $api->success() && !empty($groups['categories']) && count( $groups['categories'] > 0 ) ):
+				if ( ! $api_error && $api->success() && !empty($groups['categories']) ):
 					foreach ( $groups['categories'] as $group ) {
 						try {
 							$reply = $api->get( 'lists/'.$mailChimpListID['mailchimp_list_id'].'/interest-categories/'.$group['id'].'/interests', array('count' => 100) );
