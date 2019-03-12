@@ -213,8 +213,8 @@ class MailChimpController {
 			'event_espresso_mailchimp_add_event_list_rel_insert_array', 
 			array(
 				"event_id" => $event_id,
-				"mailchimp_list_id" => $_REQUEST["mailchimp_list_id"],
-				"mailchimp_group_id" => $_REQUEST["mailchimp_group_id"]
+				"mailchimp_list_id" => !empty($_REQUEST["mailchimp_list_id"]) ? $_REQUEST["mailchimp_list_id"] : 0,
+				"mailchimp_group_id" => !empty($_REQUEST["mailchimp_group_id"]) ? $_REQUEST["mailchimp_group_id"] : 0
 			)
 		);
 		$wpdb->insert( EVENTS_MAILCHIMP_EVENT_REL_TABLE, $sql );
@@ -239,8 +239,10 @@ class MailChimpController {
 		if ( ! empty( $currentListRelationship ) ) {
 			$data = apply_filters( 
 				'event_espresso_mailchimp_update_event_list_rel_data',
-				array("mailchimp_list_id" => $_REQUEST["mailchimp_list_id"],
-				"mailchimp_group_id" => $_REQUEST["mailchimp_group_id"] )
+					array(
+						"mailchimp_list_id" => !empty($_REQUEST["mailchimp_list_id"]) ? $_REQUEST["mailchimp_list_id"] : 0,
+						"mailchimp_group_id" => !empty($_REQUEST["mailchimp_group_id"]) ? $_REQUEST["mailchimp_group_id"] : 0 
+					)
 			);
 			$where = apply_filters( 
 				'event_espresso_mailchimp_update_event_list_rel_where',
